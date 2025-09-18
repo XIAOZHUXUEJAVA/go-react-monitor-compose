@@ -1,11 +1,20 @@
 # 监控系统 (Go Web Monitor)
 
-一个基于 Go + Next.js 的现代化系统监控解决方案，提供实时系统监控、智能告警和美观的 Web 界面。
+一个基于 Go + Next.js 的系统监控解决方案，提供实时系统监控、告警管理和 Web 界面。
+![alt text](/images/image.png)
+
+![alt text](/images/image1.png)
+
+![alt text](/images/image2.png)
+
+![alt text](images/image4.png)
+
+![alt text](images/image5.png)
 
 ## 🌟 项目特点
 
 - **🖥️ 实时监控**: CPU、内存、磁盘、网络等系统指标
-- **🚨 智能告警**: 灵活的告警规则和多级告警机制
+- **🚨 告警管理**: 基于阈值的告警规则和多级告警机制
 - **💻 现代界面**: 基于 Next.js 和 Tailwind CSS 的响应式界面
 - **🐳 容器化部署**: 完整的 Docker Compose 部署方案
 - **📊 数据可视化**: 实时图表和历史数据展示
@@ -163,7 +172,7 @@ make db-restore FILE=backup.sql
 - ✅ 系统运行时间和版本信息
 
 ### 告警管理
-- ✅ 灵活的告警规则配置
+- ✅ 基于阈值的告警规则配置
 - ✅ 多级告警严重程度（info/warning/critical）
 - ✅ 告警历史记录和统计
 - ✅ 告警确认和解决状态管理
@@ -231,8 +240,8 @@ make db-restore FILE=backup.sql
 
 ### 后端性能优化
 - 配置连接池参数
-- 启用 API 缓存
 - 优化数据库查询
+- 设置适当的数据收集间隔
 
 ## 🔧 故障排除
 
@@ -277,4 +286,38 @@ make db-restore FILE=backup.sql
 
 1. 在数据库中配置告警规则
 2. 在 `monitor-server/internal/service/alert_detector.go` 中实现检测逻辑
-3. 配置告警通知方式
+3. 根据需要扩展通知功能（邮件、webhook 等）
+
+## 🚧 待实现功能
+
+以下功能在当前版本中尚未实现，但已预留了扩展接口：
+
+### 告警通知系统
+- ✅ 告警通知数据模型已定义
+- ⏳ 邮件通知发送
+- ⏳ Webhook 通知
+- ⏳ SMS 短信通知
+- ⏳ 钉钉/企业微信集成
+
+### 高级监控功能
+- ⏳ Prometheus metrics 导出
+- ⏳ 自定义监控指标
+- ⏳ 监控数据聚合和分析
+- ⏳ 预测性告警（基于历史趋势）
+
+### 性能优化
+- ⏳ Redis 缓存集成
+- ⏳ API 响应缓存
+- ⏳ 数据库查询优化
+- ⏳ 监控数据压缩存储
+
+### 用户管理
+- ⏳ 用户认证和授权
+- ⏳ 角色权限管理
+- ⏳ 多租户支持
+
+### 扩展功能
+- ⏳ 插件系统
+- ⏳ 自定义仪表板
+- ⏳ 数据导出功能
+- ⏳ 移动端应用
