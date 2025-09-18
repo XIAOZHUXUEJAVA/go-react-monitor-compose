@@ -80,8 +80,7 @@ new-go-web-monitor/
    ```
 
 3. **访问应用**:
-   - 前端界面: http://localhost
-   - API 文档: http://localhost:9000/health
+   - 前端界面: http://localhost:3000
 
 ### 方式二：开发环境部署
 
@@ -179,7 +178,6 @@ make db-restore FILE=backup.sql
 - ✅ 系统事件记录
 
 ### 用户界面
-- ✅ 响应式设计，支持移动端
 - ✅ 实时数据图表展示
 - ✅ 直观的监控仪表板
 - ✅ 告警管理界面
