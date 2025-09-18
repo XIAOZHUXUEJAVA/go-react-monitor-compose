@@ -1,0 +1,51 @@
+# 开发环境 Dockerfile
+FROM golang:1.21-alpine
+
+# 安装开发工具
+RUN apk add --no-cache git curl make
+
+# 安装热重载工具
+RUN go install github.com/cosmtrek/air@latest
+
+# 安装调试工具 (Delve)
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制 go mod 文件
+COPY go.mod go.sum ./
+
+# 下载依赖
+RUN go mod download
+
+# 复制源代码
+COPY . .
+
+# 暴露端口
+EXPOSE 9000 2345
+
+# 创建 Air 配置文件
+RUN echo '[build]\n\
+  cmd = "go build -o ./tmp/main ./cmd/server"\n\
+  bin = "tmp/main"\n\
+  full_bin = "dlv exec ./tmp/main --listen=:2345 --headless=true --api-version=2 --accept-multiclient"\n\
+  include_ext = ["go", "tpl", "tmpl", "html", "yaml", "yml"]\n\
+  exclude_dir = ["assets", "tmp", "vendor", "frontend"]\n\
+  include_dir = []\n\
+  exclude_file = []\n\
+  delay = 1000\n\
+  stop_on_error = true\n\
+  log = "build-errors.log"\n\
+[color]\n\
+  main = "magenta"\n\
+  watcher = "cyan"\n\
+  build = "yellow"\n\
+  runner = "green"\n\
+[log]\n\
+  time = false\n\
+[misc]\n\
+  clean_on_exit = true' > .air.toml
+
+# 使用 Air 启动应用（支持热重载和调试）
+CMD ["air", "-c", ".air.toml"]

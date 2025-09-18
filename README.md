@@ -196,7 +196,6 @@ make db-restore FILE=backup.sql
 - `GET /api/v1/monitoring-configs` - 获取监控配置
 - `PUT /api/v1/monitoring-configs/{key}` - 更新配置
 
-详细 API 文档请参考: [API Documentation](monitor-server/README.md)
 
 ## 🔐 安全配置
 
