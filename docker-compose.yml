@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15-alpine
+    container_name: monitor-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: monitordb
+      POSTGRES_USER: xiaozhu
+      POSTGRES_PASSWORD: 12345679
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - monitor-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xiaozhu -d monitordb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 后端服务
+  monitor-server:
+    build:
+      context: ./monitor-server
+      dockerfile: Dockerfile
+    container_name: monitor-server
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      # 数据库配置
+      DATABASE_POSTGRES_HOST: postgres
+      DATABASE_POSTGRES_PORT: 5432
+      DATABASE_POSTGRES_USER: xiaozhu
+      DATABASE_POSTGRES_PASSWORD: 12345679
+      DATABASE_POSTGRES_DBNAME: monitordb
+      DATABASE_POSTGRES_SCHEMA: monitor
+      DATABASE_POSTGRES_SSLMODE: disable
+      DATABASE_POSTGRES_TIMEZONE: Asia/Shanghai
+      # 服务器配置
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 9000
+      # 应用配置
+      APP_ENVIRONMENT: production
+      LOG_LEVEL: info
+      LOG_FORMAT: json
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - monitor-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 前端服务
+  monitor-web:
+    build:
+      context: ./monitor-web
+      dockerfile: Dockerfile
+    container_name: monitor-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Next.js 生产环境配置
+      NODE_ENV: production
+      # API 服务器地址（容器内通信）
+      NEXT_PUBLIC_API_URL: http://monitor-server:9000
+      # 端口配置
+      PORT: 3000
+    depends_on:
+      monitor-server:
+        condition: service_healthy
+    networks:
+      - monitor-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Nginx 反向代理（可选）
+  nginx:
+    image: nginx:alpine
+    container_name: monitor-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - monitor-web
+      - monitor-server
+    networks:
+      - monitor-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  monitor-network:
+    driver: bridge

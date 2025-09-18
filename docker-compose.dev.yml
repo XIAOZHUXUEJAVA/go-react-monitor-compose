@@ -1,0 +1,105 @@
+version: '3.8'
+
+# 开发环境 Docker Compose 配置
+# 用于本地开发，支持热重载和调试
+
+services:
+  # PostgreSQL 数据库（开发环境）
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: monitor-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: monitordb
+      POSTGRES_USER: xiaozhu
+      POSTGRES_PASSWORD: 12345679
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - monitor-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xiaozhu -d monitordb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 后端服务（开发模式 - 热重载）
+  monitor-server-dev:
+    build:
+      context: ./monitor-server
+      dockerfile: Dockerfile.dev
+    container_name: monitor-server-dev
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "2345:2345"  # Delve 调试端口
+    environment:
+      # 数据库配置
+      DATABASE_POSTGRES_HOST: postgres-dev
+      DATABASE_POSTGRES_PORT: 5432
+      DATABASE_POSTGRES_USER: xiaozhu
+      DATABASE_POSTGRES_PASSWORD: 12345679
+      DATABASE_POSTGRES_DBNAME: monitordb
+      DATABASE_POSTGRES_SCHEMA: monitor
+      DATABASE_POSTGRES_SSLMODE: disable
+      DATABASE_POSTGRES_TIMEZONE: Asia/Shanghai
+      # 服务器配置
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 9000
+      # 应用配置
+      APP_ENVIRONMENT: development
+      LOG_LEVEL: debug
+      LOG_FORMAT: console
+      # 开发模式
+      GIN_MODE: debug
+    volumes:
+      # 挂载源代码实现热重载
+      - ./monitor-server:/app
+      - go_mod_cache:/go/pkg/mod
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+    networks:
+      - monitor-dev-network
+
+  # 前端服务（开发模式 - 热重载）
+  monitor-web-dev:
+    build:
+      context: ./monitor-web
+      dockerfile: Dockerfile.dev
+    container_name: monitor-web-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Next.js 开发环境配置
+      NODE_ENV: development
+      # API 服务器地址
+      NEXT_PUBLIC_API_URL: http://localhost:9000
+      # 热重载配置
+      WATCHPACK_POLLING: true
+      # 端口配置
+      PORT: 3000
+    volumes:
+      # 挂载源代码实现热重载
+      - ./monitor-web:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - monitor-server-dev
+    networks:
+      - monitor-dev-network
+
+volumes:
+  postgres_dev_data:
+    driver: local
+  go_mod_cache:
+    driver: local
+
+networks:
+  monitor-dev-network:
+    driver: bridge
