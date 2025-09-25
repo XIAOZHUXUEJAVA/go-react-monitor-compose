@@ -57,6 +57,7 @@ new-go-web-monitor/
 ├── docker-compose.dev.yml # 开发环境部署
 ├── deploy.sh            # 部署脚本
 ├── Makefile            # 管理命令
+├── LICENSE             # MIT 许可证
 └── DOCKER_DEPLOY.md    # 部署文档
 ```
 
@@ -65,16 +66,18 @@ new-go-web-monitor/
 ### 方式一：Docker Compose 部署（推荐）
 
 1. **克隆项目**:
+
    ```bash
    git clone <repository-url>
    cd new-go-web-monitor
    ```
 
 2. **一键部署**:
+
    ```bash
    # 生产环境部署
    ./deploy.sh
-   
+
    # 或使用 Makefile
    make prod-up
    ```
@@ -98,6 +101,7 @@ make dev-down
 ### 方式三：本地开发
 
 #### 后端服务
+
 ```bash
 cd monitor-server
 
@@ -118,6 +122,7 @@ make dev
 ```
 
 #### 前端应用
+
 ```bash
 cd monitor-web
 
@@ -163,6 +168,7 @@ make db-restore FILE=backup.sql
 ## 📊 功能特性
 
 ### 系统监控
+
 - ✅ CPU 使用率和负载监控
 - ✅ 内存使用情况跟踪
 - ✅ 磁盘空间和 I/O 监控
@@ -171,6 +177,7 @@ make db-restore FILE=backup.sql
 - ✅ 系统运行时间和版本信息
 
 ### 告警管理
+
 - ✅ 基于阈值的告警规则配置
 - ✅ 多级告警严重程度（info/warning/critical）
 - ✅ 告警历史记录和统计
@@ -178,6 +185,7 @@ make db-restore FILE=backup.sql
 - ✅ 系统事件记录
 
 ### 用户界面
+
 - ✅ 实时数据图表展示
 - ✅ 直观的监控仪表板
 - ✅ 告警管理界面
@@ -186,6 +194,7 @@ make db-restore FILE=backup.sql
 ## 🌐 API 接口
 
 ### 监控数据接口
+
 - `GET /api/v1/cpu` - CPU 监控数据
 - `GET /api/v1/memory` - 内存使用数据
 - `GET /api/v1/disk` - 磁盘使用数据
@@ -194,27 +203,30 @@ make db-restore FILE=backup.sql
 - `GET /api/v1/processes` - 进程列表
 
 ### 告警管理接口
+
 - `GET /api/v1/alerts` - 获取告警列表
 - `GET /api/v1/alerts/statistics` - 告警统计
 - `POST /api/v1/alerts/{id}/acknowledge` - 确认告警
 - `POST /api/v1/alerts/{id}/resolve` - 解决告警
 
 ### 配置管理接口
+
 - `GET /api/v1/monitoring-configs` - 获取监控配置
 - `PUT /api/v1/monitoring-configs/{key}` - 更新配置
-
 
 ## 🔐 安全配置
 
 ### 生产环境安全建议
 
 1. **更改默认密码**:
+
    ```bash
    # 编辑 .env 文件
    POSTGRES_PASSWORD=your-strong-password
    ```
 
 2. **启用 HTTPS**:
+
    - 配置 SSL 证书
    - 修改 Nginx 配置
    - 强制 HTTPS 重定向
@@ -227,16 +239,19 @@ make db-restore FILE=backup.sql
 ## 📈 性能优化
 
 ### 监控数据优化
+
 - 配置合适的数据收集间隔
 - 设置历史数据清理策略
 - 使用数据库索引优化查询
 
 ### 前端性能优化
+
 - 启用 Gzip 压缩
 - 配置静态资源缓存
 - 使用 CDN 加速
 
 ### 后端性能优化
+
 - 配置连接池参数
 - 优化数据库查询
 - 设置适当的数据收集间隔
@@ -246,19 +261,21 @@ make db-restore FILE=backup.sql
 ### 常见问题
 
 1. **服务无法启动**:
+
    ```bash
    # 检查端口占用
    netstat -tulpn | grep :80
-   
+
    # 查看服务日志
    make logs
    ```
 
 2. **数据库连接失败**:
+
    ```bash
    # 检查数据库状态
    docker-compose exec postgres pg_isready
-   
+
    # 重启数据库服务
    docker-compose restart postgres
    ```
@@ -291,6 +308,7 @@ make db-restore FILE=backup.sql
 以下功能在当前版本中尚未实现，仍需努力：
 
 ### 告警通知系统
+
 - ✅ 告警通知数据模型已定义
 - ⏳ 邮件通知发送
 - ⏳ Webhook 通知
@@ -298,24 +316,36 @@ make db-restore FILE=backup.sql
 - ⏳ 钉钉/企业微信集成
 
 ### 高级监控功能
+
 - ⏳ Prometheus metrics 导出
 - ⏳ 自定义监控指标
 - ⏳ 监控数据聚合和分析
 - ⏳ 预测性告警（基于历史趋势）
 
 ### 性能优化
+
 - ⏳ Redis 缓存集成
 - ⏳ API 响应缓存
 - ⏳ 数据库查询优化
 - ⏳ 监控数据压缩存储
 
 ### 用户管理
+
 - ⏳ 用户认证和授权
 - ⏳ 角色权限管理
 - ⏳ 多租户支持
 
 ### 扩展功能
+
 - ⏳ 插件系统
 - ⏳ 自定义仪表板
 - ⏳ 数据导出功能
 - ⏳ 移动端应用
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 详情请查看 [LICENSE](LICENSE) 文件。
+
+## 👨‍💻 作者
+
+- **xiaozhu** - [GitHub](https://github.com/XIAOZHUXUEJAVA)
